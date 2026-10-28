@@ -1,0 +1,9 @@
+---
+fail2ban_bantime: 3600
+fail2ban_findtime: 600
+fail2ban_maxretry: 5
+
+login_banner: |
+  ********************************************************************
+  *  Authorized access only. All activity is monitored and logged.   *
+  ********************************************************************

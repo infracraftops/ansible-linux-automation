@@ -1,0 +1,10 @@
+---
+firewall_default_zone: public
+
+firewall_allowed_tcp_ports:
+  - "22"
+
+firewall_allowed_udp_ports: []
+
+firewall_allowed_services:
+  - ssh

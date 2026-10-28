@@ -1,0 +1,32 @@
+---
+# Global variables — override per host or group as needed
+
+# NTP
+ntp_servers:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+  - 2.pool.ntp.org
+
+# Users
+admin_users:
+  - name: ansible
+    groups: wheel
+    shell: /bin/bash
+    ssh_key: ""  # paste public key here
+
+# Firewall
+firewall_allowed_tcp_ports:
+  - "22"
+  - "80"
+  - "443"
+
+# Web server
+apache_vhosts:
+  - servername: "example.com"
+    documentroot: "/var/www/example.com"
+
+# Security
+login_banner: |
+  ********************************************************************
+  *  Authorized access only. All activity is monitored and logged.   *
+  ********************************************************************

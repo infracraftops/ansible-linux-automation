@@ -1,0 +1,15 @@
+# Managed by Ansible — do not edit manually
+
+<VirtualHost *:80>
+    ServerName {{ item.servername }}
+    DocumentRoot {{ item.documentroot }}
+
+    <Directory {{ item.documentroot }}>
+        Options -Indexes +FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog /var/log/httpd/{{ item.servername }}_error.log
+    CustomLog /var/log/httpd/{{ item.servername }}_access.log combined
+</VirtualHost>

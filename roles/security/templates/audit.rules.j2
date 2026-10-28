@@ -1,0 +1,36 @@
+# Managed by Ansible — do not edit manually
+
+# Remove existing rules
+-D
+
+# Buffer size
+-b 8192
+
+# Failure mode (1=print, 2=panic)
+-f 1
+
+# Monitor authentication events
+-w /var/log/faillog -p wa -k auth
+-w /var/log/lastlog -p wa -k auth
+-w /var/run/faillock -p wa -k auth
+
+# Monitor user/group changes
+-w /etc/passwd -p wa -k identity
+-w /etc/shadow -p wa -k identity
+-w /etc/group -p wa -k identity
+-w /etc/gshadow -p wa -k identity
+-w /etc/sudoers -p wa -k identity
+-w /etc/sudoers.d/ -p wa -k identity
+
+# Monitor SSH config
+-w /etc/ssh/sshd_config -p wa -k sshd
+
+# Monitor cron
+-w /etc/cron.allow -p wa -k cron
+-w /etc/cron.deny -p wa -k cron
+-w /etc/crontab -p wa -k cron
+-w /etc/cron.d/ -p wa -k cron
+
+# Monitor system calls for privilege escalation
+-a always,exit -F arch=b64 -S setuid -S setgid -k privilege_escalation
+-a always,exit -F arch=b64 -S execve -F euid=0 -F auid>=1000 -k privilege_escalation

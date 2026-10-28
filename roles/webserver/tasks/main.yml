@@ -1,0 +1,53 @@
+---
+- name: Install Apache and dependencies
+  dnf:
+    name:
+      - httpd
+      - httpd-tools
+      - mod_ssl
+    state: present
+
+- name: Ensure Apache is started and enabled
+  service:
+    name: httpd
+    state: started
+    enabled: yes
+
+- name: Create document roots for virtual hosts
+  file:
+    path: "{{ item.documentroot }}"
+    state: directory
+    owner: apache
+    group: apache
+    mode: '0755'
+  loop: "{{ apache_vhosts }}"
+
+- name: Deploy virtual host configs
+  template:
+    src: vhost.conf.j2
+    dest: "/etc/httpd/conf.d/{{ item.servername }}.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ apache_vhosts }}"
+  notify: restart httpd
+
+- name: Deploy default index page for each vhost
+  template:
+    src: index.html.j2
+    dest: "{{ item.documentroot }}/index.html"
+    owner: apache
+    group: apache
+    mode: '0644'
+  loop: "{{ apache_vhosts }}"
+
+- name: Allow HTTP and HTTPS through firewall
+  firewalld:
+    service: "{{ item }}"
+    permanent: yes
+    state: enabled
+  loop:
+    - http
+    - https
+  notify: reload firewalld
+  ignore_errors: yes

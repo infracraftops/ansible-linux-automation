@@ -1,0 +1,37 @@
+---
+baseline_timezone: UTC
+
+baseline_selinux_state: enforcing
+
+baseline_packages:
+  - vim
+  - curl
+  - wget
+  - net-tools
+  - bind-utils
+  - tcpdump
+  - lsof
+  - htop
+  - rsync
+  - unzip
+
+baseline_packages_remove:
+  - telnet
+  - rsh
+  - rsh-server
+  - talk
+  - talk-server
+
+baseline_services_disable:
+  - rpcbind
+  - avahi-daemon
+
+baseline_sysctl_settings:
+  - { key: "net.ipv4.ip_forward", value: "0" }
+  - { key: "net.ipv4.conf.all.send_redirects", value: "0" }
+  - { key: "net.ipv4.conf.default.send_redirects", value: "0" }
+  - { key: "net.ipv4.conf.all.accept_redirects", value: "0" }
+  - { key: "net.ipv4.conf.default.accept_redirects", value: "0" }
+  - { key: "net.ipv4.conf.all.log_martians", value: "1" }
+  - { key: "net.ipv4.tcp_syncookies", value: "1" }
+  - { key: "kernel.dmesg_restrict", value: "1" }

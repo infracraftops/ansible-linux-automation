@@ -1,0 +1,4 @@
+---
+apache_vhosts:
+  - servername: "example.com"
+    documentroot: "/var/www/example.com"

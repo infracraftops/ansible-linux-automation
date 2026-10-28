@@ -1,0 +1,39 @@
+---
+- name: Create admin users
+  user:
+    name: "{{ item.name }}"
+    groups: "{{ item.groups }}"
+    shell: "{{ item.shell }}"
+    state: present
+    create_home: yes
+  loop: "{{ admin_users }}"
+
+- name: Add SSH authorized keys
+  authorized_key:
+    user: "{{ item.name }}"
+    key: "{{ item.ssh_key }}"
+    state: present
+  loop: "{{ admin_users }}"
+  when: item.ssh_key | length > 0
+
+- name: Configure sudoers for wheel group
+  copy:
+    content: "%wheel ALL=(ALL) NOPASSWD: ALL\n"
+    dest: /etc/sudoers.d/wheel
+    owner: root
+    group: root
+    mode: '0440'
+    validate: /usr/sbin/visudo -cf %s
+
+- name: Ensure root account is locked
+  user:
+    name: root
+    password_lock: yes
+  when: users_lock_root | bool
+
+- name: Remove unauthorized users
+  user:
+    name: "{{ item }}"
+    state: absent
+    remove: yes
+  loop: "{{ users_remove }}"

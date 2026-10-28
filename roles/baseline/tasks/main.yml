@@ -1,0 +1,49 @@
+---
+- name: Set hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Ensure required packages are installed
+  dnf:
+    name: "{{ baseline_packages }}"
+    state: present
+
+- name: Remove unnecessary packages
+  dnf:
+    name: "{{ baseline_packages_remove }}"
+    state: absent
+
+- name: Apply sysctl hardening settings
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  loop: "{{ baseline_sysctl_settings }}"
+
+- name: Configure SSH
+  template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: '0600'
+    validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+
+- name: Ensure SELinux is enforcing
+  selinux:
+    policy: targeted
+    state: "{{ baseline_selinux_state }}"
+
+- name: Set system timezone
+  timezone:
+    name: "{{ baseline_timezone }}"
+
+- name: Ensure unneeded services are disabled
+  service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  loop: "{{ baseline_services_disable }}"
+  ignore_errors: yes

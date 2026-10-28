@@ -1,0 +1,64 @@
+---
+- name: Install security packages
+  dnf:
+    name:
+      - auditd
+      - fail2ban
+      - aide
+    state: present
+
+- name: Ensure auditd is started and enabled
+  service:
+    name: auditd
+    state: started
+    enabled: yes
+
+- name: Deploy auditd rules
+  template:
+    src: audit.rules.j2
+    dest: /etc/audit/rules.d/hardening.rules
+    owner: root
+    group: root
+    mode: '0640'
+  notify: restart auditd
+
+- name: Deploy fail2ban configuration
+  template:
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart fail2ban
+
+- name: Ensure fail2ban is started and enabled
+  service:
+    name: fail2ban
+    state: started
+    enabled: yes
+
+- name: Set login banner (issue)
+  copy:
+    content: "{{ login_banner }}"
+    dest: /etc/issue
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Set login banner (issue.net)
+  copy:
+    content: "{{ login_banner }}"
+    dest: /etc/issue.net
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Set password expiry policy
+  lineinfile:
+    path: /etc/login.defs
+    regexp: "^{{ item.key }}"
+    line: "{{ item.key }}\t{{ item.value }}"
+  loop:
+    - { key: "PASS_MAX_DAYS", value: "90" }
+    - { key: "PASS_MIN_DAYS", value: "7" }
+    - { key: "PASS_WARN_AGE", value: "14" }
