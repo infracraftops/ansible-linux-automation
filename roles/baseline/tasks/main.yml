@@ -3,6 +3,11 @@
   hostname:
     name: "{{ inventory_hostname }}"
 
+- name: Install EPEL repository
+  dnf:
+    name: epel-release
+    state: present
+
 - name: Ensure required packages are installed
   dnf:
     name: "{{ baseline_packages }}"
